@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use serde_json::{Result as SerdeResult, Value, from_value};
 use crate::utils::deserialize_string_to_i32;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -9,13 +10,14 @@ pub enum Table {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ErgastResponse {
+pub struct ErgastResponse<T> {
     #[serde(rename = "MRData")]
-    mrdata: MRData
+    mrdata: MRData<T>
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct MRData {
+pub struct MRData<T>
+{
     xmlns: String,
     series: String,
     url: String,
@@ -26,7 +28,7 @@ pub struct MRData {
     #[serde(deserialize_with = "deserialize_string_to_i32")]
     total: i32,
     #[serde(rename = "RaceTable")]
-    race_table: RaceTable
+    table: T
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -98,4 +100,52 @@ pub struct Location {
 pub struct Schedule {
     date: String,
     time: String,
+}
+
+pub fn deserialize_mr_data(json: &str) -> SerdeResult<MRData<Table>> {
+    let value: Value = serde_json::from_str(json)?;
+    
+    let xmlns = value["MRData"]["xmlns"].as_str().unwrap().to_string();
+    let series = value["MRData"]["series"].as_str().unwrap().to_string();
+    let url = value["MRData"]["url"].as_str().unwrap().to_string();
+    let limit: i32 = value["MRData"]["limit"].as_str().unwrap().parse().expect("Not a valid integer");
+    let offset: i32 = value["MRData"]["offset"].as_str().unwrap().parse().expect("Not a valid integer");
+    let total: i32 = value["MRData"]["total"].as_str().unwrap().parse().expect("Not a valid integer");
+
+    let mut table = None;
+
+    let keys = [
+        "xmlns",
+        "series",
+        "url",
+        "limit",
+        "offset",
+        "total",
+    ];
+
+    if let Value::Object(map) = &value["MRData"] {
+        for (k, v) in map {
+            if !keys.contains(&k.as_str()) {
+                println!("key is {k}");
+                table = if let Ok(table) = from_value::<SeasonTable>(v.clone()) {
+                    Some(Table::SeasonTable(table))
+                } else if let Ok(table) = from_value::<RaceTable>(v.clone()) {
+                    Some(Table::RaceTable(table))
+                } else {
+                    None
+                };
+                break;
+            }
+        }
+    }
+
+    Ok(MRData {
+        xmlns,
+        series,
+        url,
+        limit,
+        offset,
+        total,
+        table: table.expect("Failed to deserialize dynamic table"),
+    })
 }
