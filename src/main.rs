@@ -1,10 +1,11 @@
 mod models;
 mod utils;
+mod api;
 use reqwest::Error;
 
 #[tokio::main]
 async fn main() -> Result<(), Error>{
-    let response = reqwest::get("https://ergast.com/api/f1/seasons.json").await?;
+    let response = api::API::get(api::EndPoint::Race).await?;
 
     if response.status().is_success() {
         let ergast_response: models::ErgastResponse = response.json().await?;
