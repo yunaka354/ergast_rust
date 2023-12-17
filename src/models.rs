@@ -1,13 +1,16 @@
-use serde::{Deserialize, Serialize};
-use serde_json::{Result as SerdeResult, Value, from_value};
+use serde::{Deserialize, Serialize, de::DeserializeOwned};
+use serde_json::{Result as SerdeResult, Value, Error};
 use crate::utils::deserialize_string_to_i32;
 
-#[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = "type")] // Use a tag to distinguish between types
-pub enum Table {
-    SeasonTable(SeasonTable),
-    RaceTable(RaceTable)
+pub trait Table: DeserializeOwned {
+    fn convert(value: Value) -> Result<Self, Error>
+    {
+        serde_json::from_value(value)
+    }
 }
+
+// Implement Deserializable for any type that implements Deserialize
+impl<T: DeserializeOwned> Table for T {}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ErgastResponse<T> {
@@ -48,6 +51,7 @@ pub struct Season {
 pub struct RaceTable {
     #[serde(deserialize_with = "deserialize_string_to_i32")]
     season: i32,
+    round: Option<String>,
     #[serde(rename = "Races")]
     races: Vec<Race>
 }
@@ -65,6 +69,8 @@ pub struct Race {
     circuit: Circuit,
     date: String,
     time: String,
+    #[serde(rename = "Results")]
+    results: Option<Vec<RaceResult>>,
     #[serde(rename = "FirstPractice")]
     first_practice: Option<Schedule>,
     #[serde(rename = "SecondPractice")]
@@ -102,17 +108,91 @@ pub struct Schedule {
     time: String,
 }
 
-pub fn deserialize_mr_data(json: &str) -> SerdeResult<MRData<Table>> {
+// this is named "Result" in Ergast API. Renamed RaceResult not to mix up Result in Rust.
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RaceResult {
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    number: i32,
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    position: i32,
+    #[serde(rename="positionText")]
+    position_text: String,
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    points: i32,
+    #[serde(rename="Driver")]
+    driver: Driver,
+    #[serde(rename="Constructor")]
+    constructor: Constructor,
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    grid: i32,
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    laps: i32,
+    status: String,
+    #[serde(rename="Time")]
+    time: Option<Time>,
+    #[serde(rename="FastestLap")]
+    fastest_lap: FastestLap,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Driver {
+    #[serde(rename="driverId")]
+    driver_id: String,
+    #[serde(rename="permanentNumber", deserialize_with = "deserialize_string_to_i32")]
+    permanent_number: i32,
+    code: String,
+    url: String,
+    #[serde(rename="givenName")]
+    given_name: String,
+    #[serde(rename="familyName")]
+    family_name: String,
+    #[serde(rename="dateOfBirth")]
+    date_of_birth: String,
+    nationality: String
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Constructor {
+    #[serde(rename="constructorId")]
+    constructor_id: String,
+    url: String,
+    name: String,
+    nationality: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Time {
+    millis: Option<String>,
+    time: String
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct FastestLap {
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    rank: i32,
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    lap: i32,
+    #[serde(rename="Time")]
+    time: Time,
+    #[serde(rename="AverageSpeed")]
+    average_speed: AverageSpeed,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AverageSpeed {
+    units: String,
+    speed: String,
+}
+
+
+pub fn deserialize_mr_data<T: Table>(json: &str) -> SerdeResult<MRData<T>> {
     let value: Value = serde_json::from_str(json)?;
-    
     let xmlns = value["MRData"]["xmlns"].as_str().unwrap().to_string();
     let series = value["MRData"]["series"].as_str().unwrap().to_string();
     let url = value["MRData"]["url"].as_str().unwrap().to_string();
     let limit: i32 = value["MRData"]["limit"].as_str().unwrap().parse().expect("Not a valid integer");
     let offset: i32 = value["MRData"]["offset"].as_str().unwrap().parse().expect("Not a valid integer");
     let total: i32 = value["MRData"]["total"].as_str().unwrap().parse().expect("Not a valid integer");
-
-    let mut table = None;
 
     let keys = [
         "xmlns",
@@ -123,21 +203,20 @@ pub fn deserialize_mr_data(json: &str) -> SerdeResult<MRData<Table>> {
         "total",
     ];
 
-    if let Value::Object(map) = &value["MRData"] {
-        for (k, v) in map {
-            if !keys.contains(&k.as_str()) {
-                println!("key is {k}");
-                table = if let Ok(table) = from_value::<SeasonTable>(v.clone()) {
-                    Some(Table::SeasonTable(table))
-                } else if let Ok(table) = from_value::<RaceTable>(v.clone()) {
-                    Some(Table::RaceTable(table))
-                } else {
-                    None
-                };
-                break;
+    
+    let key_finder = |val: Value| {
+        if let Value::Object(map) = val {
+            for (k, _v) in map {
+                if !keys.contains(&k.as_str()) {
+                    println!("key is {k}");
+                    return Ok(k.to_owned())
+                }
             }
         }
-    }
+        Err("Cannot find key for data table".to_string())
+    };
+    let key_for_table = key_finder(value["MRData"].clone()).unwrap();
+    
 
     Ok(MRData {
         xmlns,
@@ -146,6 +225,6 @@ pub fn deserialize_mr_data(json: &str) -> SerdeResult<MRData<Table>> {
         limit,
         offset,
         total,
-        table: table.expect("Failed to deserialize dynamic table"),
+        table: T::convert(value["MRData"][key_for_table].clone()).unwrap(),
     })
 }

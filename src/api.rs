@@ -4,6 +4,7 @@ use reqwest::{Response, Error};
 pub enum EndPoint {
     Seasons,
     Race,
+    Results,
 }
 
 impl EndPoint {
@@ -11,6 +12,7 @@ impl EndPoint {
         match self {
             EndPoint::Seasons => "seasons",
             EndPoint::Race => "current",
+            EndPoint::Results => "current/last/results",
         }
     }
 }
