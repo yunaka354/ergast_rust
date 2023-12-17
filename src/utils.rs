@@ -1,6 +1,6 @@
 use serde::de::{self, Visitor};
-use std::fmt;
 use serde::{self, Deserializer};
+use std::fmt;
 
 pub fn deserialize_string_to_i32<'de, D>(deserializer: D) -> Result<i32, D::Error>
 where

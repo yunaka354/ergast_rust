@@ -1,27 +1,10 @@
-use reqwest::{Response, Error};
-
-#[allow(dead_code)]
-pub enum EndPoint {
-    Seasons,
-    Race,
-    Results,
-}
-
-impl EndPoint {
-    fn to_string(&self) -> &str {
-        match self {
-            EndPoint::Seasons => "seasons",
-            EndPoint::Race => "current",
-            EndPoint::Results => "current/last/results",
-        }
-    }
-}
+use reqwest::{Error, Response};
 
 pub struct API {}
 
 impl API {
-    pub async fn get(endpoint: EndPoint) -> Result<Response, Error> {
-        let url = format!("https://ergast.com/api/f1/{}.json", endpoint.to_string());
+    pub async fn get(url: &str) -> Result<Response, Error> {
+        let url = format!("https://ergast.com/api/f1/{}.json", url);
         reqwest::get(url).await
     }
 }
