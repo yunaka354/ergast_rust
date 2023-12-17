@@ -39,19 +39,29 @@ pub struct SeasonTable {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Season {
-    #[serde(deserialize_with = "deserialize_string_to_i32")]
-    season: i32,
-    url: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
 pub struct RaceTable {
     #[serde(deserialize_with = "deserialize_string_to_i32")]
     season: i32,
     round: Option<String>,
     #[serde(rename = "Races")]
     races: Vec<Race>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct QualifyingTable {
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    season: i32,
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    round: i32,
+    #[serde(rename = "Races")]
+    races: Vec<Qualifying>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Season {
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    season: i32,
+    url: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -183,6 +193,41 @@ pub struct FastestLap {
 pub struct AverageSpeed {
     units: String,
     speed: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Qualifying {
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    season: i32,
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    round: i32,
+    url: String,
+    #[serde(rename = "raceName")]
+    race_name: String,
+    #[serde(rename = "Circuit")]
+    circuit: Circuit,
+    date: String,
+    time: String,
+    #[serde(rename = "QualifyingResults")]
+    qualifying_results: Vec<QualifyingResult>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct QualifyingResult {
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    number: i32,
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    position: i32,
+    #[serde(rename = "Driver")]
+    driver: Driver,
+    #[serde(rename = "Constructor")]
+    constructor: Constructor,
+    #[serde(rename = "Q1")]
+    q1: Option<String>,
+    #[serde(rename = "Q2")]
+    q2: Option<String>,
+    #[serde(rename = "Q3")]
+    q3: Option<String>,
 }
 
 pub fn deserialize_mr_data<T: Table>(json: &str) -> SerdeResult<MRData<T>> {
