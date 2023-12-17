@@ -58,6 +58,16 @@ pub struct QualifyingTable {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct SprintTable {
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    season: i32,
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    round: i32,
+    #[serde(rename = "Races")]
+    races: Vec<Sprint>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Season {
     #[serde(deserialize_with = "deserialize_string_to_i32")]
     season: i32,
@@ -179,14 +189,13 @@ pub struct Time {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FastestLap {
-    #[serde(deserialize_with = "deserialize_string_to_i32")]
-    rank: i32,
+    rank: Option<String>,
     #[serde(deserialize_with = "deserialize_string_to_i32")]
     lap: i32,
     #[serde(rename = "Time")]
     time: Time,
     #[serde(rename = "AverageSpeed")]
-    average_speed: AverageSpeed,
+    average_speed: Option<AverageSpeed>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -228,6 +237,23 @@ pub struct QualifyingResult {
     q2: Option<String>,
     #[serde(rename = "Q3")]
     q3: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Sprint {
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    season: i32,
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    round: i32,
+    url: String,
+    #[serde(rename = "raceName")]
+    race_name: String,
+    #[serde(rename = "Circuit")]
+    circuit: Circuit,
+    date: String,
+    time: String,
+    #[serde(rename = "SprintResults")]
+    sprint_results: Vec<RaceResult>, // use same data structure as race result
 }
 
 pub fn deserialize_mr_data<T: Table>(json: &str) -> SerdeResult<MRData<T>> {

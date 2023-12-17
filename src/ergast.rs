@@ -1,5 +1,7 @@
 use crate::api;
-use crate::models::{deserialize_mr_data, MRData, QualifyingTable, RaceTable, SeasonTable, Table};
+use crate::models::{
+    deserialize_mr_data, MRData, QualifyingTable, RaceTable, SeasonTable, SprintTable, Table,
+};
 use reqwest::{Error, Response};
 
 pub struct Ergast {}
@@ -24,6 +26,12 @@ impl Ergast {
         let url = format!("{year}/{round}/qualifying");
         let response = api::API::get(&url).await?;
         Ok(Ergast::handle_response::<QualifyingTable>(response).await)
+    }
+
+    pub async fn sprint(year: i32, round: i32) -> Result<MRData<SprintTable>, Error> {
+        let url = format!("{year}/{round}/sprint");
+        let response = api::API::get(&url).await?;
+        Ok(Ergast::handle_response::<SprintTable>(response).await)
     }
 
     async fn handle_response<T: Table>(response: Response) -> MRData<T> {
