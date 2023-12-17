@@ -84,6 +84,12 @@ pub struct DriverTable {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct ConstructorTable {
+    #[serde(rename = "Constructors")]
+    constructors: Vec<Constructor>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Season {
     #[serde(deserialize_with = "deserialize_string_to_i32")]
     season: i32,
