@@ -1,49 +1,47 @@
 use crate::api;
 use crate::models::{
-    deserialize_mr_data, MRData, QualifyingTable, RaceTable, SeasonTable, SprintTable, Table, StandingTable,
+    deserialize_mr_data, MRData, QualifyingTable, RaceTable, SeasonTable, SprintTable,
+    StandingTable, Table,
 };
-use reqwest::{Error, Response};
+use reqwest::Error;
 
-pub struct Ergast {}
+pub struct Ergast;
 
 impl Ergast {
     pub async fn seasons() -> Result<MRData<SeasonTable>, Error> {
-        let response = api::API::get("seasons").await?;
-        Ok(Ergast::handle_response::<SeasonTable>(response).await)
+        Ok(Ergast::fetch::<SeasonTable>("seasons").await.unwrap())
     }
 
     pub async fn race() -> Result<MRData<RaceTable>, Error> {
-        let response = api::API::get("current").await?;
-        Ok(Ergast::handle_response::<RaceTable>(response).await)
+        Ok(Ergast::fetch::<RaceTable>("current").await.unwrap())
     }
 
     pub async fn results() -> Result<MRData<RaceTable>, Error> {
-        let response = api::API::get("current/last/results").await?;
-        Ok(Ergast::handle_response::<RaceTable>(response).await)
+        Ok(Ergast::fetch::<RaceTable>("current/last/results")
+            .await
+            .unwrap())
     }
 
     pub async fn qualifying(year: i32, round: i32) -> Result<MRData<QualifyingTable>, Error> {
         let url = format!("{year}/{round}/qualifying");
-        let response = api::API::get(&url).await?;
-        Ok(Ergast::handle_response::<QualifyingTable>(response).await)
+        Ok(Ergast::fetch::<QualifyingTable>(&url).await.unwrap())
     }
 
     pub async fn sprint(year: i32, round: i32) -> Result<MRData<SprintTable>, Error> {
         let url = format!("{year}/{round}/sprint");
-        let response = api::API::get(&url).await?;
-        Ok(Ergast::handle_response::<SprintTable>(response).await)
+        Ok(Ergast::fetch::<SprintTable>(&url).await.unwrap())
     }
 
     pub async fn standings(year: i32, round: i32) -> Result<MRData<StandingTable>, Error> {
         let url = format!("{year}/{round}/driverStandings");
-        let response = api::API::get(&url).await?;
-        Ok(Ergast::handle_response::<StandingTable>(response).await)
+        Ok(Ergast::fetch::<StandingTable>(&url).await.unwrap())
     }
 
-    async fn handle_response<T: Table>(response: Response) -> MRData<T> {
+    async fn fetch<T: Table>(url: &str) -> Result<MRData<T>, Error> {
+        let response = api::API::get(&url).await?;
         if response.status().is_success() {
             let json = response.text().await.unwrap();
-            return deserialize_mr_data::<T>(&json).unwrap();
+            return Ok(deserialize_mr_data::<T>(&json).unwrap());
         } else {
             panic!("Failed to get data: {:?}", response.status());
         }

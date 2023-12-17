@@ -292,7 +292,6 @@ pub struct DriverStanding {
     constructors: Vec<Constructor>,
 }
 
-
 pub fn deserialize_mr_data<T: Table>(json: &str) -> SerdeResult<MRData<T>> {
     let value: Value = serde_json::from_str(json)?;
     let xmlns = value["MRData"]["xmlns"].as_str().unwrap().to_string();
