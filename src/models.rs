@@ -68,6 +68,16 @@ pub struct SprintTable {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct StandingTable {
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    season: i32,
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    round: i32,
+    #[serde(rename = "StandingsLists")]
+    standings_lists: Vec<StandingsList>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Season {
     #[serde(deserialize_with = "deserialize_string_to_i32")]
     season: i32,
@@ -255,6 +265,33 @@ pub struct Sprint {
     #[serde(rename = "SprintResults")]
     sprint_results: Vec<RaceResult>, // use same data structure as race result
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct StandingsList {
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    season: i32,
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    round: i32,
+    #[serde(rename = "DriverStandings")]
+    driver_standings: Vec<DriverStanding>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DriverStanding {
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    position: i32,
+    #[serde(rename = "positionText")]
+    position_text: String,
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    points: i32,
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    wins: i32,
+    #[serde(rename = "Driver")]
+    driver: Driver,
+    #[serde(rename = "Constructors")]
+    constructors: Vec<Constructor>,
+}
+
 
 pub fn deserialize_mr_data<T: Table>(json: &str) -> SerdeResult<MRData<T>> {
     let value: Value = serde_json::from_str(json)?;
