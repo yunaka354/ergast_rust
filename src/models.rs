@@ -78,6 +78,12 @@ pub struct StandingTable {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct DriverTable {
+    #[serde(rename = "Drivers")]
+    drivers: Vec<Driver>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Season {
     #[serde(deserialize_with = "deserialize_string_to_i32")]
     season: i32,
@@ -166,12 +172,9 @@ pub struct RaceResult {
 pub struct Driver {
     #[serde(rename = "driverId")]
     driver_id: String,
-    #[serde(
-        rename = "permanentNumber",
-        deserialize_with = "deserialize_string_to_i32"
-    )]
-    permanent_number: i32,
-    code: String,
+    #[serde(rename = "permanentNumber")]
+    permanent_number: Option<String>,
+    code: Option<String>,
     url: String,
     #[serde(rename = "givenName")]
     given_name: String,
