@@ -90,6 +90,12 @@ pub struct ConstructorTable {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct CircuitTable {
+    #[serde(rename = "Circuits")]
+    circuits: Vec<Circuit>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Season {
     #[serde(deserialize_with = "deserialize_string_to_i32")]
     season: i32,

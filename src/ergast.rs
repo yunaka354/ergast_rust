@@ -1,7 +1,7 @@
 use crate::api;
 use crate::models::{
     deserialize_mr_data, DriverTable, MRData, QualifyingTable, RaceTable, SeasonTable, SprintTable,
-    StandingTable, Table, ConstructorTable,
+    StandingTable, Table, ConstructorTable, CircuitTable,
 };
 use reqwest::Error;
 
@@ -44,6 +44,10 @@ impl Ergast {
 
     pub async fn constructors(params: Option<api::URLParams>) -> Result<MRData<ConstructorTable>, Error> {
         Ok(Ergast::fetch::<ConstructorTable>("constructors", params).await.unwrap())
+    }
+
+    pub async fn circuits(params: Option<api::URLParams>) -> Result<MRData<CircuitTable>, Error> {
+        Ok(Ergast::fetch::<CircuitTable>("circuits", params).await.unwrap())
     }
 
     async fn fetch<T: Table>(

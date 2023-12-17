@@ -9,7 +9,7 @@ async fn main() {
         limit: 1000,
         offset: 0,
     };
-    let data = ergast::Ergast::constructors(Some(params)).await.unwrap();
+    let data = ergast::Ergast::circuits(Some(params)).await.unwrap();
 
     let pretty_json = serde_json::to_string_pretty(&data)
         .expect("Failed to serialize object");
