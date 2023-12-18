@@ -1,8 +1,8 @@
 mod api;
 mod ergast;
 mod models;
-mod utils;
 mod scripts;
+mod utils;
 
 #[tokio::main]
 async fn main() {
