@@ -1,4 +1,6 @@
-use crate::utils::deserialize_string_to_i32;
+use crate::utils::{
+    deserialize_string_to_f32, deserialize_string_to_i32, deserialize_string_to_option_i32,
+};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_json::{Error, Result as SerdeResult, Value};
 
@@ -120,7 +122,7 @@ pub struct Race {
     #[serde(rename = "Circuit")]
     pub circuit: Circuit,
     pub date: String,
-    pub time: String,
+    pub time: Option<String>,
     #[serde(rename = "Results")]
     pub results: Option<Vec<RaceResult>>,
     #[serde(rename = "FirstPractice")]
@@ -161,20 +163,20 @@ pub struct Location {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Schedule {
     pub date: String,
-    pub time: String,
+    pub time: Option<String>,
 }
 
 // this is named "Result" in Ergast API. Renamed RaceResult not to mix up Result in Rust.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RaceResult {
-    #[serde(deserialize_with = "deserialize_string_to_i32")]
-    pub number: i32,
+    #[serde(deserialize_with = "deserialize_string_to_option_i32")]
+    pub number: Option<i32>,
     #[serde(deserialize_with = "deserialize_string_to_i32")]
     pub position: i32,
     #[serde(rename = "positionText")]
     pub position_text: String,
-    #[serde(deserialize_with = "deserialize_string_to_i32")]
-    pub points: i32,
+    #[serde(deserialize_with = "deserialize_string_to_f32")]
+    pub points: f32,
     #[serde(rename = "Driver")]
     pub driver: Driver,
     #[serde(rename = "Constructor")]
@@ -187,7 +189,7 @@ pub struct RaceResult {
     #[serde(rename = "Time")]
     pub time: Option<Time>,
     #[serde(rename = "FastestLap")]
-    pub fastest_lap: FastestLap,
+    pub fastest_lap: Option<FastestLap>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

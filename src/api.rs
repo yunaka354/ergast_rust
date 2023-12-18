@@ -1,5 +1,6 @@
 use reqwest::{Error, Response};
 
+#[derive(Clone, Copy)]
 pub struct URLParams {
     pub limit: i32,
     pub offset: i32,
