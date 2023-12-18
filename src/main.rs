@@ -6,14 +6,12 @@ mod utils;
 #[tokio::main]
 async fn main() {
     let params = api::URLParams {
-        limit: 100,
+        limit: 1,
         offset: 0,
     };
-    let data = ergast::Ergast::pitstops(2023, 5, Some(params))
+    let data = ergast::Ergast::standings(2020, 1, Some(params))
         .await
         .unwrap();
 
-    let pretty_json = serde_json::to_string_pretty(&data).expect("Failed to serialize object");
-
-    println!("{}", pretty_json);
+    println!("{:?}", data);
 }
