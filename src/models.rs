@@ -96,6 +96,12 @@ pub struct CircuitTable {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct StatusTable {
+    #[serde(rename = "Status")]
+    status: Vec<Status>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Season {
     #[serde(deserialize_with = "deserialize_string_to_i32")]
     season: i32,
@@ -305,6 +311,15 @@ pub struct DriverStanding {
     driver: Driver,
     #[serde(rename = "Constructors")]
     constructors: Vec<Constructor>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Status {
+    #[serde(rename="statusId", deserialize_with = "deserialize_string_to_i32")]
+    status_id: i32,
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    count: i32,
+    status: String,
 }
 
 pub fn deserialize_mr_data<T: Table>(json: &str) -> SerdeResult<MRData<T>> {
