@@ -1,7 +1,7 @@
 use crate::api;
 use crate::models::{
-    deserialize_mr_data, DriverTable, MRData, QualifyingTable, RaceTable, SeasonTable, SprintTable,
-    StandingTable, Table, ConstructorTable, CircuitTable, StatusTable,
+    deserialize_mr_data, CircuitTable, ConstructorTable, DriverTable, MRData, QualifyingTable,
+    RaceTable, SeasonTable, SprintTable, StandingTable, StatusTable, Table,
 };
 use reqwest::Error;
 
@@ -39,19 +39,38 @@ impl Ergast {
     }
 
     pub async fn drivers(params: Option<api::URLParams>) -> Result<MRData<DriverTable>, Error> {
-        Ok(Ergast::fetch::<DriverTable>("drivers", params).await.unwrap())
+        Ok(Ergast::fetch::<DriverTable>("drivers", params)
+            .await
+            .unwrap())
     }
 
-    pub async fn constructors(params: Option<api::URLParams>) -> Result<MRData<ConstructorTable>, Error> {
-        Ok(Ergast::fetch::<ConstructorTable>("constructors", params).await.unwrap())
+    pub async fn constructors(
+        params: Option<api::URLParams>,
+    ) -> Result<MRData<ConstructorTable>, Error> {
+        Ok(Ergast::fetch::<ConstructorTable>("constructors", params)
+            .await
+            .unwrap())
     }
 
     pub async fn circuits(params: Option<api::URLParams>) -> Result<MRData<CircuitTable>, Error> {
-        Ok(Ergast::fetch::<CircuitTable>("circuits", params).await.unwrap())
+        Ok(Ergast::fetch::<CircuitTable>("circuits", params)
+            .await
+            .unwrap())
     }
 
     pub async fn status(params: Option<api::URLParams>) -> Result<MRData<StatusTable>, Error> {
-        Ok(Ergast::fetch::<StatusTable>("status", params).await.unwrap())
+        Ok(Ergast::fetch::<StatusTable>("status", params)
+            .await
+            .unwrap())
+    }
+
+    pub async fn laps(
+        year: i32,
+        round: i32,
+        params: Option<api::URLParams>,
+    ) -> Result<MRData<RaceTable>, Error> {
+        let url = format!("{year}/{round}/laps");
+        Ok(Ergast::fetch::<RaceTable>(&url, params).await.unwrap())
     }
 
     async fn fetch<T: Table>(

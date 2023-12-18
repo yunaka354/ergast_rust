@@ -133,6 +133,8 @@ pub struct Race {
     qualifying: Option<Schedule>,
     #[serde(rename = "Sprint")]
     sprint: Option<Schedule>,
+    #[serde(rename = "Laps")]
+    laps: Option<Vec<Lap>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -315,11 +317,28 @@ pub struct DriverStanding {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Status {
-    #[serde(rename="statusId", deserialize_with = "deserialize_string_to_i32")]
+    #[serde(rename = "statusId", deserialize_with = "deserialize_string_to_i32")]
     status_id: i32,
     #[serde(deserialize_with = "deserialize_string_to_i32")]
     count: i32,
     status: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Lap {
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    number: i32,
+    #[serde(rename = "Timings")]
+    timings: Vec<Timing>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Timing {
+    #[serde(rename = "driverId")]
+    driver_id: String,
+    #[serde(deserialize_with = "deserialize_string_to_i32")]
+    position: i32,
+    time: String,
 }
 
 pub fn deserialize_mr_data<T: Table>(json: &str) -> SerdeResult<MRData<T>> {
