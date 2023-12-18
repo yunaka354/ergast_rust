@@ -120,7 +120,7 @@ pub struct Race {
     #[serde(rename = "Circuit")]
     pub circuit: Circuit,
     pub date: String,
-    pub time: String,
+    pub time: Option<String>,
     #[serde(rename = "Results")]
     pub results: Option<Vec<RaceResult>>,
     #[serde(rename = "FirstPractice")]
@@ -161,7 +161,7 @@ pub struct Location {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Schedule {
     pub date: String,
-    pub time: String,
+    pub time: Option<String>,
 }
 
 // this is named "Result" in Ergast API. Renamed RaceResult not to mix up Result in Rust.
