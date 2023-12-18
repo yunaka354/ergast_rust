@@ -73,6 +73,15 @@ impl Ergast {
         Ok(Ergast::fetch::<RaceTable>(&url, params).await.unwrap())
     }
 
+    pub async fn pitstops(
+        year: i32,
+        round: i32,
+        params: Option<api::URLParams>,
+    ) -> Result<MRData<RaceTable>, Error> {
+        let url = format!("{year}/{round}/pitstops");
+        Ok(Ergast::fetch::<RaceTable>(&url, params).await.unwrap())
+    }
+
     async fn fetch<T: Table>(
         url: &str,
         params: Option<api::URLParams>,
