@@ -4,7 +4,7 @@ use std::future::Future;
 
 use reqwest::Error;
 
-use crate::api::{URLParams, self, Path};
+use crate::api::{self, Path, URLParams};
 use crate::ergast::Ergast;
 use crate::models::MRData;
 
@@ -114,14 +114,13 @@ pub async fn health_check() -> () {
             let _response = Ergast::pitstops(Some(path), Some(params)).await.unwrap();
         }
     }
-
 }
 
 async fn iterate_over<F, Fut, T>(f: F) -> ()
 where
     F: Fn(Option<api::Path>, Option<api::URLParams>) -> Fut,
     Fut: Future<Output = Result<MRData<T>, Error>>,
-    T: Debug
+    T: Debug,
 {
     let limit = 1000;
     let response = f(None, None).await.unwrap();
@@ -130,10 +129,7 @@ where
 
     for i in 0..pages {
         let offset = limit * i;
-        let params = URLParams {
-            limit,
-            offset,
-        };
+        let params = URLParams { limit, offset };
         let response = f(None, Some(params)).await.unwrap();
         println!("{:?}", params);
         println!("{:?}", response);

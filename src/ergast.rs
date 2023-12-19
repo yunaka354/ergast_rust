@@ -48,7 +48,7 @@ impl Ergast {
         let url = Ergast::build_path("sprint", path);
         Ok(Ergast::fetch::<SprintTable>(&url, params).await.unwrap())
     }
-    
+
     pub async fn standings(
         path: Option<api::Path>,
         params: Option<api::URLParams>,
