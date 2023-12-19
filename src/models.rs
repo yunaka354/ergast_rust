@@ -44,7 +44,8 @@ pub struct SeasonTable {
 pub struct RaceTable {
     #[serde(deserialize_with = "deserialize_string_to_i32")]
     pub season: i32,
-    pub round: Option<String>,
+    #[serde(deserialize_with = "deserialize_string_to_option_i32", default)]
+    pub round: Option<i32>,
     #[serde(rename = "Races")]
     pub races: Vec<Race>,
 }
@@ -196,8 +197,8 @@ pub struct RaceResult {
 pub struct Driver {
     #[serde(rename = "driverId")]
     pub driver_id: String,
-    #[serde(rename = "permanentNumber")]
-    pub permanent_number: Option<String>,
+    #[serde(rename = "permanentNumber", deserialize_with = "deserialize_string_to_option_i32", default)]
+    pub permanent_number: Option<i32>,
     pub code: Option<String>,
     pub url: String,
     #[serde(rename = "givenName")]
@@ -226,7 +227,8 @@ pub struct Time {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FastestLap {
-    pub rank: Option<String>,
+    #[serde(deserialize_with = "deserialize_string_to_option_i32", default)]
+    pub rank: Option<i32>,
     #[serde(deserialize_with = "deserialize_string_to_i32")]
     pub lap: i32,
     #[serde(rename = "Time")]
