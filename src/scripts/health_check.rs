@@ -8,6 +8,7 @@ use crate::api::{self, Path, URLParams};
 use crate::ergast::Ergast;
 use crate::models::MRData;
 
+#[allow(dead_code)]
 pub async fn health_check() -> () {
     // check seasons
     let seasons = Ergast::seasons(URLParams::default()).await.unwrap();
@@ -116,6 +117,7 @@ pub async fn health_check() -> () {
     }
 }
 
+#[allow(dead_code)]
 async fn iterate_over<F, Fut, T>(f: F) -> ()
 where
     F: Fn(Option<api::Path>, Option<api::URLParams>) -> Fut,
