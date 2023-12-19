@@ -10,13 +10,13 @@ use crate::models::MRData;
 
 pub async fn health_check() -> () {
     // check seasons
-    let seasons = Ergast::seasons(Some(URLParams::default())).await.unwrap();
+    let seasons = Ergast::seasons(URLParams::default()).await.unwrap();
     let seasons_total = seasons.total;
     let seasons_params = URLParams {
         limit: seasons_total,
         offset: 0,
     };
-    let seasons = Ergast::seasons(Some(seasons_params)).await.unwrap();
+    let seasons = Ergast::seasons(seasons_params).await.unwrap();
     let seasons = seasons.table.seasons;
 
     // check race
@@ -28,7 +28,7 @@ pub async fn health_check() -> () {
             limit: 100,
             offset: 0,
         };
-        let response = Ergast::race(year, Some(params)).await.unwrap();
+        let response = Ergast::race(year, params).await.unwrap();
         map.insert(year, response.table.races); // store data for next checking
     }
 
@@ -111,7 +111,7 @@ pub async fn health_check() -> () {
                 round: Some(round),
             };
             println!("fetch pitstops() for year {year}, round {round}");
-            let _response = Ergast::pitstops(Some(path), Some(params)).await.unwrap();
+            let _response = Ergast::pitstops(path, params).await.unwrap();
         }
     }
 }

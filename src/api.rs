@@ -24,13 +24,11 @@ pub struct Path {
 pub struct API {}
 
 impl API {
-    pub async fn get(url: &str, params: Option<URLParams>) -> Result<Response, Error> {
+    pub async fn get(url: &str, params: URLParams) -> Result<Response, Error> {
         let mut url = format!("https://ergast.com/api/f1/{}.json", url);
         // if params is thrown, add parameters to url.
-        if let Some(p) = params {
-            let params = format!("?limit={}&offset={}", p.limit, p.offset);
-            url.push_str(&params);
-        }
+        let params = format!("?limit={}&offset={}", params.limit, params.offset);
+        url.push_str(&params);
         println!("get...{url}");
         reqwest::get(url).await
     }
