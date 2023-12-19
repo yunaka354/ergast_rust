@@ -51,30 +51,30 @@ pub struct RaceTable {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct QualifyingTable {
-    #[serde(deserialize_with = "deserialize_string_to_i32")]
-    pub season: i32,
-    #[serde(deserialize_with = "deserialize_string_to_i32")]
-    pub round: i32,
+    #[serde(deserialize_with = "deserialize_string_to_option_i32", default)]
+    pub season: Option<i32>,
+    #[serde(deserialize_with = "deserialize_string_to_option_i32", default)]
+    pub round: Option<i32>,
     #[serde(rename = "Races")]
     pub races: Vec<Qualifying>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SprintTable {
-    #[serde(deserialize_with = "deserialize_string_to_i32")]
-    pub season: i32,
-    #[serde(deserialize_with = "deserialize_string_to_i32")]
-    pub round: i32,
+    #[serde(deserialize_with = "deserialize_string_to_option_i32", default)]
+    pub season: Option<i32>,
+    #[serde(deserialize_with = "deserialize_string_to_option_i32", default)]
+    pub round: Option<i32>,
     #[serde(rename = "Races")]
     pub races: Vec<Sprint>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct StandingTable {
-    #[serde(deserialize_with = "deserialize_string_to_i32")]
-    pub season: i32,
-    #[serde(deserialize_with = "deserialize_string_to_i32")]
-    pub round: i32,
+    #[serde(deserialize_with = "deserialize_string_to_option_i32", default)]
+    pub season: Option<i32>,
+    #[serde(deserialize_with = "deserialize_string_to_option_i32", default)]
+    pub round: Option<i32>,
     #[serde(rename = "StandingsLists")]
     pub standings_lists: Vec<StandingsList>,
 }
@@ -253,7 +253,7 @@ pub struct Qualifying {
     #[serde(rename = "Circuit")]
     pub circuit: Circuit,
     pub date: String,
-    pub time: String,
+    pub time: Option<String>,
     #[serde(rename = "QualifyingResults")]
     pub qualifying_results: Vec<QualifyingResult>,
 }

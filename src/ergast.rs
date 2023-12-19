@@ -24,40 +24,36 @@ impl Ergast {
     }
 
     pub async fn results(
-        year: i32,
-        round: i32,
+        path: Option<api::Path>,
         params: Option<api::URLParams>,
     ) -> Result<MRData<RaceTable>, Error> {
-        let url = format!("{year}/{round}/results");
+        let url = Ergast::build_path("results", path);
         Ok(Ergast::fetch::<RaceTable>(&url, params).await.unwrap())
     }
 
     pub async fn qualifying(
-        year: i32,
-        round: i32,
+        path: Option<api::Path>,
         params: Option<api::URLParams>,
     ) -> Result<MRData<QualifyingTable>, Error> {
-        let url = format!("{year}/{round}/qualifying");
+        let url = Ergast::build_path("qualifying", path);
         Ok(Ergast::fetch::<QualifyingTable>(&url, params)
             .await
             .unwrap())
     }
 
     pub async fn sprint(
-        year: i32,
-        round: i32,
+        path: Option<api::Path>,
         params: Option<api::URLParams>,
     ) -> Result<MRData<SprintTable>, Error> {
-        let url = format!("{year}/{round}/sprint");
+        let url = Ergast::build_path("sprint", path);
         Ok(Ergast::fetch::<SprintTable>(&url, params).await.unwrap())
     }
-
+    
     pub async fn standings(
-        year: i32,
-        round: i32,
+        path: Option<api::Path>,
         params: Option<api::URLParams>,
     ) -> Result<MRData<StandingTable>, Error> {
-        let url = format!("{year}/{round}/driverStandings");
+        let url = Ergast::build_path("driverStandings", path);
         Ok(Ergast::fetch::<StandingTable>(&url, params).await.unwrap())
     }
 
@@ -88,20 +84,18 @@ impl Ergast {
     }
 
     pub async fn laps(
-        year: i32,
-        round: i32,
+        path: Option<api::Path>,
         params: Option<api::URLParams>,
     ) -> Result<MRData<RaceTable>, Error> {
-        let url = format!("{year}/{round}/laps");
+        let url = Ergast::build_path("laps", path);
         Ok(Ergast::fetch::<RaceTable>(&url, params).await.unwrap())
     }
 
     pub async fn pitstops(
-        year: i32,
-        round: i32,
+        path: Option<api::Path>,
         params: Option<api::URLParams>,
     ) -> Result<MRData<RaceTable>, Error> {
-        let url = format!("{year}/{round}/pitstops");
+        let url = Ergast::build_path("pitstops", path);
         Ok(Ergast::fetch::<RaceTable>(&url, params).await.unwrap())
     }
 
@@ -115,6 +109,27 @@ impl Ergast {
             return Ok(deserialize_mr_data::<T>(&json).unwrap());
         } else {
             panic!("Failed to get data: {:?}", response.status());
+        }
+    }
+
+    fn build_path(endpoint: &str, path: Option<api::Path>) -> String {
+        match path {
+            Some(p) => {
+                let year = p.year.to_string();
+                match p.round {
+                    // if year and round are specified, concatinate all.
+                    Some(r) => {
+                        let round = r.to_string();
+                        format!("{year}/{round}/{endpoint}")
+                    }
+                    // if only year is specified, specify year only.
+                    None => format!("{year}/{endpoint}"),
+                }
+            }
+            // if path is not specified, use endpoint only.
+            None => {
+                format!("{endpoint}")
+            }
         }
     }
 }
