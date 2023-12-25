@@ -15,10 +15,7 @@ impl Ergast {
             .unwrap())
     }
 
-    pub async fn race(
-        year: i32,
-        params: api::URLParams,
-    ) -> Result<MRData<RaceTable>, Error> {
+    pub async fn race(year: i32, params: api::URLParams) -> Result<MRData<RaceTable>, Error> {
         let url = format!("{year}");
         Ok(Ergast::fetch::<RaceTable>(&url, params).await.unwrap())
     }
@@ -63,9 +60,7 @@ impl Ergast {
             .unwrap())
     }
 
-    pub async fn constructors(
-        params: api::URLParams,
-    ) -> Result<MRData<ConstructorTable>, Error> {
+    pub async fn constructors(params: api::URLParams) -> Result<MRData<ConstructorTable>, Error> {
         Ok(Ergast::fetch::<ConstructorTable>("constructors", params)
             .await
             .unwrap())
@@ -83,10 +78,7 @@ impl Ergast {
             .unwrap())
     }
 
-    pub async fn laps(
-        path: api::Path,
-        params: api::URLParams,
-    ) -> Result<MRData<RaceTable>, Error> {
+    pub async fn laps(path: api::Path, params: api::URLParams) -> Result<MRData<RaceTable>, Error> {
         let url = Ergast::build_path("laps", path);
         Ok(Ergast::fetch::<RaceTable>(&url, params).await.unwrap())
     }
@@ -99,10 +91,7 @@ impl Ergast {
         Ok(Ergast::fetch::<RaceTable>(&url, params).await.unwrap())
     }
 
-    async fn fetch<T: Table>(
-        url: &str,
-        params: api::URLParams,
-    ) -> Result<MRData<T>, Error> {
+    async fn fetch<T: Table>(url: &str, params: api::URLParams) -> Result<MRData<T>, Error> {
         let response = api::API::get(&url, params).await?;
         if response.status().is_success() {
             let json = response.text().await.unwrap();

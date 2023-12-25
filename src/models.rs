@@ -197,7 +197,11 @@ pub struct RaceResult {
 pub struct Driver {
     #[serde(rename = "driverId")]
     pub driver_id: String,
-    #[serde(rename = "permanentNumber", deserialize_with = "deserialize_string_to_option_i32", default)]
+    #[serde(
+        rename = "permanentNumber",
+        deserialize_with = "deserialize_string_to_option_i32",
+        default
+    )]
     pub permanent_number: Option<i32>,
     pub code: Option<String>,
     pub url: String,
