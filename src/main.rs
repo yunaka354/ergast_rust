@@ -1,7 +1,6 @@
 mod api;
 mod ergast;
 mod models;
-mod scripts;
 mod utils;
 
 #[tokio::main]
